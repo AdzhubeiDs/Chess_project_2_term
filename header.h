@@ -2,14 +2,18 @@
 #define HEADER_H_INCLUDED
 
 #include <iostream>
-#include <vector>
+#include <random>
 #include <unordered_set>
+#include <vector>
 using namespace std;
 
-typedef pair<size_t, size_t> pst;
-typedef vector<vector<size_t>> vst2;
-#define x first
-#define y second
+size_t minR = 1;
+size_t maxR = 10000;
+
+random_device rd;
+mt19937 mt(rd());
+uniform_int_distribution<size_t> dist(minR, maxR);
+// size_t rand_num = dist(mt);
 
 struct hash_pair {
     template <class T1, class T2>
@@ -21,46 +25,55 @@ struct hash_pair {
     }
 };
 
+typedef vector<int> vint;
+typedef vector<vint> vint2;
+typedef pair<int, int> pint;
+typedef vector<pint> vpint;
+typedef vector<vpint> vpst2;
+typedef unordered_set<pint, hash_pair> us;
+typedef vector<us> vus;
+
 enum Colors : size_t {
     white = 0,
     black
 };
 enum Pieces : size_t {
     pawn = 0,
-    king,
     knight,
-    rook,
     bishop,
+    rook,
     queen,
+    king,
     noth
 };
 
 enum boardPieces : size_t {
     empt = 0,
     whitePawn,  // 1
-    whiteKing,  // 2
-    whiteKnight,// 3
+    whiteKnight,// 2
+    whiteBishop,// 3
     whiteRook,  // 4
-    whiteBishop,// 5
-    whiteQueen, // 6
+    whiteQueen, // 5
+    whiteKing,  // 6
 
     blackPawn,  // 7
-    blackKing,  // 8
-    blackKnight,// 9
+    blackKnight,// 8
+    blackBishop,// 9
     blackRook,  // 10
-    blackBishop,// 11
-    blackQueen  // 12
+    blackQueen,  // 11
+    blackKing  // 12
 };
+
 
 class Board {
 public:
-    Board()=default;
-    ~Board()=default;
+    Board() = default;
+    ~Board() = default;
 
     inline virtual void print(const Pieces id = Pieces::noth);
-    inline virtual unordered_set<pst, hash_pair> getPositions(const boardPieces id);
+    inline virtual us getPositions(const boardPieces id);
     static vector<vector<size_t>> map;
-    static pst whiteKingPos;
-    static pst blackKingPos;
+    static pint whiteKingPos;
+    static pint blackKingPos;
 };
 #endif // HEADER_H_INCLUDED
