@@ -24,37 +24,37 @@ inline unordered_set<pair<int, int>, hash_pair> Piece::getPositions(const boardP
 vector<pair<int, int>> Piece::pawnMoves(int i, int j, Colors col) {
     vector<pair<int, int>> ret;
     if (col == white) {
-        // первый ход на 2 клетки вверх
+        // РїРµСЂРІС‹Р№ С…РѕРґ РЅР° 2 РєР»РµС‚РєРё РІРІРµСЂС…
         if (i == 6 && Board::map[5][j] == boardPieces::empt && Board::map[4][j] == boardPieces::empt) {
             ret.push_back(pair<int, int>(4, j));
         }
-        // ход на 1 клетку вверх
+        // С…РѕРґ РЅР° 1 РєР»РµС‚РєСѓ РІРІРµСЂС…
         if (i - 1 > 0 && Board::map[i - 1][j] == boardPieces::empt) {
             ret.push_back(pair<int, int>(i - 1, j));
         }
-        // кушание влево вверх
+        // РєСѓС€Р°РЅРёРµ РІР»РµРІРѕ РІРІРµСЂС…
         if (checkRange(i - 1, j - 1) && checkCell(i - 1, j - 1, Colors::white)) {
             ret.push_back(pair<int, int>(i - 1, j - 1));
         }
-        // кушание вправо вверх
+        // РєСѓС€Р°РЅРёРµ РІРїСЂР°РІРѕ РІРІРµСЂС…
         if (checkRange(i - 1, j + 1) && checkCell(i - 1, j + 1, Colors::white)) {
             ret.push_back(pair<int, int>(i - 1, j + 1));
         }
     }
     else { // black
-        // первый ход на 2 клетки вниз
+        // РїРµСЂРІС‹Р№ С…РѕРґ РЅР° 2 РєР»РµС‚РєРё РІРЅРёР·
         if (i == 1 && Board::map[2][j] == boardPieces::empt && Board::map[3][j] == boardPieces::empt) {
             ret.push_back(pair<int, int>(3, j));
         }
-        // ход на 1 клетку вниз
+        // С…РѕРґ РЅР° 1 РєР»РµС‚РєСѓ РІРЅРёР·
         if (i + 1 <= 7 && Board::map[i + 1][j] == boardPieces::empt) {
             ret.push_back(pair<int, int>(i + 1, j));
         }
-        // кушание влево вниз
+        // РєСѓС€Р°РЅРёРµ РІР»РµРІРѕ РІРЅРёР·
         if (checkRange(i + 1, j - 1) && checkCell(i + 1, j - 1, Colors::black)) {
             ret.push_back(pair<int, int>(i + 1, j - 1));
         }
-        // кушание вправо вниз
+        // РєСѓС€Р°РЅРёРµ РІРїСЂР°РІРѕ РІРЅРёР·
         if (checkRange(i + 1, j + 1) && checkCell(i + 1, j + 1, Colors::black)) {
             ret.push_back(pair<int, int>(i + 1, j + 1));
         }
@@ -63,7 +63,7 @@ vector<pair<int, int>> Piece::pawnMoves(int i, int j, Colors col) {
 }
 vector<pair<int, int>> Piece::knightMoves(int i, int j, Colors col) {
     vector<pair<int, int>> ret;
-    // пони ходят буковкой Г
+    // РїРѕРЅРё С…РѕРґСЏС‚ Р±СѓРєРѕРІРєРѕР№ Р“
     if (checkRange(i + 2, j - 1) && (Board::map[i + 2][j - 1] == boardPieces::empt || checkCell(i + 2, j - 1, col))) {
         ret.push_back(pair<int, int>(i + 2, j - 1));
     }
@@ -93,11 +93,11 @@ vector<pair<int, int>> Piece::knightMoves(int i, int j, Colors col) {
 vector<pair<int, int>> Piece::rookMoves(int i, int j, Colors col) {
     vector<pair<int, int>> ret;
 
-    // смотрим клетки снизу
+    // СЃРјРѕС‚СЂРёРј РєР»РµС‚РєРё СЃРЅРёР·Сѓ
     for (int k = i + 1; k <= 7; k++) {
         if (Board::map[k][j] == boardPieces::empt || (checkCell(k, j, col))) {
             ret.push_back({ k, j });
-            // если кого-то съели
+            // РµСЃР»Рё РєРѕРіРѕ-С‚Рѕ СЃСЉРµР»Рё
             if (Board::map[j][j] != boardPieces::empt /*checkCell(k, j, col)*/) {
                 break;
             }
@@ -105,11 +105,11 @@ vector<pair<int, int>> Piece::rookMoves(int i, int j, Colors col) {
         else break;
     }
 
-    // смотрим клетки сверху
+    // СЃРјРѕС‚СЂРёРј РєР»РµС‚РєРё СЃРІРµСЂС…Сѓ
     for (int k = i - 1; k >= 0; k--) {
         if (Board::map[k][j] == boardPieces::empt || (checkCell(k, j, col))) {
             ret.push_back({ k, j });
-            // если кого-то съели
+            // РµСЃР»Рё РєРѕРіРѕ-С‚Рѕ СЃСЉРµР»Рё
             if (Board::map[j][j] != boardPieces::empt /*checkCell(k, j, col)*/) {
                 break;
             }
@@ -117,11 +117,11 @@ vector<pair<int, int>> Piece::rookMoves(int i, int j, Colors col) {
         else break;
     }
 
-    // смотрим клетки справа
+    // СЃРјРѕС‚СЂРёРј РєР»РµС‚РєРё СЃРїСЂР°РІР°
     for (int k = j + 1; k <= 7; k++) {
         if (Board::map[i][k] == boardPieces::empt || (checkCell(i, k, col))) {
             ret.push_back({ i, k });
-            // если кого-то съели
+            // РµСЃР»Рё РєРѕРіРѕ-С‚Рѕ СЃСЉРµР»Рё
             if (Board::map[i][k] != boardPieces::empt /*checkCell(i, k, col)*/) {
                 break;
             }
@@ -129,11 +129,11 @@ vector<pair<int, int>> Piece::rookMoves(int i, int j, Colors col) {
         else break;
     }
 
-    // смотрим клетки слево
+    // СЃРјРѕС‚СЂРёРј РєР»РµС‚РєРё СЃР»РµРІРѕ
     for (int k = j - 1; k >= 0; k--) {
         if (Board::map[i][k] == boardPieces::empt || (checkCell(i, k, col))) {
             ret.push_back({ i, k });
-            // если кого-то съели
+            // РµСЃР»Рё РєРѕРіРѕ-С‚Рѕ СЃСЉРµР»Рё
             if (Board::map[i][k] != boardPieces::empt /*checkCell(i, k, col)*/) {
                 break;
             }
@@ -145,7 +145,7 @@ vector<pair<int, int>> Piece::rookMoves(int i, int j, Colors col) {
 vector<pair<int, int>> Piece::bishopMoves(int i, int j, Colors col) {
     vector<pair<int, int>> ret;
 
-    // все диагонали диагональ
+    // РІСЃРµ РґРёР°РіРѕРЅР°Р»Рё РґРёР°РіРѕРЅР°Р»СЊ
     for (auto ii : { -1, 1 }) {
         for (auto jj : { -1, 1 }) {
             int dx = ii, dy = jj;
@@ -171,8 +171,8 @@ vector<pair<int, int>> Piece::bishopMoves(int i, int j, Colors col) {
     }
     return ret;
 }
-// спасибо ферзю что ходит как ладья + слон\
-    -30 строк кода
+// СЃРїР°СЃРёР±Рѕ С„РµСЂР·СЋ С‡С‚Рѕ С…РѕРґРёС‚ РєР°Рє Р»Р°РґСЊСЏ + СЃР»РѕРЅ\
+    -30 СЃС‚СЂРѕРє РєРѕРґР°
 vector<pair<int, int>> Piece::queenMoves(int i, int j, Colors col) {
     vector<pair<int, int>> ret = rookMoves(i, j, col);
     vector<pair<int, int>> temp = bishopMoves(i, j, col);
@@ -218,13 +218,13 @@ boardPieces Piece::returnFigure(Pieces piece, Colors col) {
     }
 }
 
-// проверка на границы доски
+// РїСЂРѕРІРµСЂРєР° РЅР° РіСЂР°РЅРёС†С‹ РґРѕСЃРєРё
 inline bool Piece::checkRange(int i, int j) {
     return i >= 0 && i <= 7 && j >= 0 && j <= 7;
 }
-// проверяем, встретили ли мы вражескую фигуру (кроме короля, с ним какая-то пиздень будет)
+// РїСЂРѕРІРµСЂСЏРµРј, РІСЃС‚СЂРµС‚РёР»Рё Р»Рё РјС‹ РІСЂР°Р¶РµСЃРєСѓСЋ С„РёРіСѓСЂСѓ (РєСЂРѕРјРµ РєРѕСЂРѕР»СЏ, СЃ РЅРёРј РєР°РєР°СЏ-С‚Рѕ РїРёР·РґРµРЅСЊ Р±СѓРґРµС‚)
 inline bool Piece::checkCell(int i, int j, Colors col) {
-    // проверяем, если кодировка вражеской фигуры, кроме короля
+    // РїСЂРѕРІРµСЂСЏРµРј, РµСЃР»Рё РєРѕРґРёСЂРѕРІРєР° РІСЂР°Р¶РµСЃРєРѕР№ С„РёРіСѓСЂС‹, РєСЂРѕРјРµ РєРѕСЂРѕР»СЏ
     if (col == white) {
         return Board::map[i][j] >= 7 && Board::map[i][j] <= /*12*/ 11;
     }
@@ -241,7 +241,7 @@ vector<vector<bool>> Piece::getAllAttacks(Colors col) {
     for (int i = 0; i <= 5; i++) {
         Pieces temp = static_cast<Pieces>(i);
         unordered_set<pair<int, int>, hash_pair> tempUs = Board::getPositions(returnFigure(temp, col));
-        // белые пешки
+        // Р±РµР»С‹Рµ РїРµС€РєРё
         if (temp == Pieces::pawn && col == Colors::white) {
             for (auto it : tempUs) {
                 for (auto it2 : { -1, 1 }) {
@@ -251,7 +251,7 @@ vector<vector<bool>> Piece::getAllAttacks(Colors col) {
                 }
             }
         }
-        // черные пешки
+        // С‡РµСЂРЅС‹Рµ РїРµС€РєРё
         else if (temp == Pieces::pawn && col == Colors::black) {
             for (auto it : tempUs) {
                 for (auto it2 : { -1, 1 }) {
@@ -261,7 +261,7 @@ vector<vector<bool>> Piece::getAllAttacks(Colors col) {
                 }
             }
         }
-        // ладья 
+        // Р»Р°РґСЊСЏ
         else if (temp == Pieces::rook) {
             for (auto it : tempUs) {
                 for (int k = it.first + 1; k <= 7; k++) {
@@ -315,7 +315,7 @@ vector<vector<bool>> Piece::getAllAttacks(Colors col) {
                 }
             }
         }
-        // слон
+        // СЃР»РѕРЅ
         else if (temp == Pieces::bishop) {
             for (auto it : tempUs) {
                 for (auto ii : { -1, 1 }) {
@@ -342,10 +342,10 @@ vector<vector<bool>> Piece::getAllAttacks(Colors col) {
                 }
             }
         }
-        // конь
+        // РєРѕРЅСЊ
         else if (temp == Pieces::knight) {
             for (auto it : tempUs) {
-                // пони ходят буковкой Г
+                // РїРѕРЅРё С…РѕРґСЏС‚ Р±СѓРєРѕРІРєРѕР№ Р“
                 if (checkRange(it.first + 2, it.second - 1)) {
                     nm[it.first + 2][it.second - 1] = true;
                 }
@@ -372,7 +372,7 @@ vector<vector<bool>> Piece::getAllAttacks(Colors col) {
                 }
             }
         }
-        // ферзь
+        // С„РµСЂР·СЊ
         else if (temp == Pieces::queen) {
         for (auto it : tempUs) {
 
@@ -458,7 +458,7 @@ vector<vector<bool>> Piece::getAllAttacks(Colors col) {
             }
         }
         }
-        // король
+        // РєРѕСЂРѕР»СЊ
         else if (temp == Pieces::king) {
             auto q = *tempUs.begin();
             for (auto it : { -1, 0, 1 }) {

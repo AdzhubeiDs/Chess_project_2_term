@@ -5,10 +5,8 @@
 #include <vector>
 #include <set>
 
-using namespace std;
 
 namespace Tools {
-    // size_t rand_num = dist(mt);
 
     struct rnd {
         int minR;

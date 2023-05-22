@@ -1,4 +1,5 @@
 #include "blackAndWhitePieces.h"
+using namespace std;
 
 class ChessEngine : protected Piece {
 public:
@@ -15,8 +16,8 @@ public:
 
     retNewMove makeNextMove(Colors col);
 
-    // предполагаем, что сделан корректный ход\
-    защиты от дурака пока что не будет
+    // РїСЂРµРґРїРѕР»Р°РіР°РµРј, С‡С‚Рѕ СЃРґРµР»Р°РЅ РєРѕСЂСЂРµРєС‚РЅС‹Р№ С…РѕРґ\
+    Р·Р°С‰РёС‚С‹ РѕС‚ РґСѓСЂР°РєР° РїРѕРєР° С‡С‚Рѕ РЅРµ Р±СѓРґРµС‚
     void setNextMove(int from1, int from2, int to1, int to2, Colors col);
 
     void printAttackBoard(Colors col) {

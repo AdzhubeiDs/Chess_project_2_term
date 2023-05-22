@@ -69,13 +69,13 @@ int main()
 
     vector<Sprite> f(32);
     unordered_map<pair<int, int>, int, hash_pair> um;
-    
+
     //Music soundMove;
     //soundMove.openFromFile("music/move.mp3");
 
     RenderWindow window(VideoMode(504, 504), "The Chess", Style::Close);
     //RenderWindow secondWindow(VideoMode(240, 320), "Noob");
-    
+
     Image icon;
     icon.loadFromFile("images/smallFakt.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -87,11 +87,11 @@ int main()
         f[i].setTexture(t1);
     }
     loadPosition(f, um);
-    
+
     Sprite s(t1);
     Sprite sBoard(t2);
 
-    bool isMove = false, isComp = false;
+    bool isMove = false, notMove = false;
     float dx = 0, dy = 0;
     Vector2i prevPos;
     int n = 0;
@@ -110,55 +110,71 @@ int main()
         {
             if (e.type == Event::Closed || winOrLose != 0)
                 window.close();
-            
+
             // если тыгыдыкнули и держим ЛКМ*
             if (e.type == Event::MouseButtonPressed && e.key.code == Mouse::Left) {
-                for (int i = 0; i < 32; i++) {
-                    if (f[i].getGlobalBounds().contains(pos.x, pos.y)) {
-                        isMove = true;
-                        prevPos = pos;
+                if (pos.y / intSize >= 0 && pos.y / intSize <= 7 && pos.x / intSize >= 0 && pos.x / intSize <= 7 &&
+                    board[pos.y / intSize][pos.x / intSize] > 0) {
+                    notMove = false;
+                    for (int i = 0; i < 32; i++) {
+                        if (f[i].getGlobalBounds().contains(pos.x, pos.y)) {
+                            isMove = true;
+                            prevPos = pos;
 
-                        n = i;
-                        dx = pos.x - f[i].getPosition().x;
-                        dy = pos.y - f[i].getPosition().y;
+
+                            n = i;
+                            dx = pos.x - f[i].getPosition().x;
+                            dy = pos.y - f[i].getPosition().y;
+                        }
                     }
+                }
+                else {
+                    notMove = true;
                 }
             }
             // отпускаем ЛКМ
-            else if (e.type == Event::MouseButtonReleased && e.key.code == Mouse::Left) {
-                //soundMove.play();
-                isMove = false;
-
-                int t11 = abs(prevPos.y / intSize), t12 = abs(prevPos.x / intSize);
-                int t21 = abs(pos.y / intSize), t22 = abs(pos.x / intSize);
-                ce.setNextMove(t11, t12, t21, t22, col);
-
-
-
-                if (board[t11][t12] > 0 && board[t21][t22] < 0 || board[t11][t12] < 0 && board[t21][t22] > 0) {
-                    f[um[{pos.y / intSize, pos.x / intSize}]].setTexture(emptyTexture);
-                    um.erase({ pos.y / intSize, pos.x / intSize });
-
-                    board[pos.y / intSize][pos.x / intSize] = 0;
+            else if (e.type == Event::MouseButtonReleased && e.key.code == Mouse::Left && !notMove) {
+                // если отпускаем на ту же позицию
+                if (pos.y / intSize == prevPos.y / intSize && pos.x / intSize == prevPos.x / intSize) {
+                    isMove = false;
+                    f[n].setPosition(intSize * (pos.x / intSize), intSize * (pos.y / intSize));
                 }
-                swap(board[t11][t12], board[t21][t22]);
-                f[n].setPosition(intSize * t22, intSize * t21);
-                um[{t21, t22}] = um[{t11, t12}];
-                um.erase({ t11, t12 });
+                else {
+                    //soundMove.play();
+                    isMove = false;
 
-                // превращаем в ферзя
-                if (board[t21][t22] == 6 && t21 == 0) {
-                    board[t21][t22] = 4; // ферзь
-                    int x = 3, y = 1;
-                    f[n].setTextureRect(IntRect(intSize * x, intSize * y, intSize, intSize));
+                    int t11 = abs(prevPos.y / intSize), t12 = abs(prevPos.x / intSize);
+                    int t21 = abs(pos.y / intSize), t22 = abs(pos.x / intSize);
+                    ce.setNextMove(t11, t12, t21, t22, col);
+
+
+
+                    if (board[t11][t12] > 0 && board[t21][t22] < 0 || board[t11][t12] < 0 && board[t21][t22] > 0) {
+                        f[um[{pos.y / intSize, pos.x / intSize}]].setTexture(emptyTexture);
+                        um.erase({ pos.y / intSize, pos.x / intSize });
+
+                        board[pos.y / intSize][pos.x / intSize] = 0;
+                    }
+                    swap(board[t11][t12], board[t21][t22]);
+                    f[n].setPosition(intSize * t22, intSize * t21);
+                    um[{t21, t22}] = um[{t11, t12}];
+                    um.erase({ t11, t12 });
+
+                    // превращаем в ферзя
+                    if (board[t21][t22] == 6 && t21 == 0) {
+                        board[t21][t22] = 4; // ферзь
+                        int x = 3, y = 1;
+                        f[n].setTextureRect(IntRect(intSize * x, intSize * y, intSize, intSize));
+                    }
+
+                    //pv2();
+
+                    //ce.printAttackBoard(black);
                 }
-
-                //pv2();
-
-                //ce.printAttackBoard(black);
             }
-            else if (e.type == Event::/*KeyPressed*/MouseButtonPressed) {
-                if (e.key.code == Mouse::Right/*Keyboard::Space*/) {
+            // KeyReleased чтобы не было 1000000 ходов при залипании клавиш
+            else if (e.type == Event::MouseButtonPressed || e.type == Event::KeyReleased ) {
+                if (e.key.code == Mouse::Right || e.key.code == Keyboard::Space) {
                     //soundMove.play();
                     retNewMove rnm = ce.makeNextMove(Colors::black);
                     if (rnm.bp == boardPieces::empt) {
@@ -188,6 +204,7 @@ int main()
                     //pv2();
                 }
 
+
                 // сдача (кэщбек)
                 else if (e.key.code == Keyboard::BackSpace) {
                     winOrLose = 2;
@@ -208,7 +225,7 @@ int main()
         if (winOrLose != 0) {
             RenderWindow secondWindow(VideoMode(360, 480), "Result");
             Texture st;
-            
+
             Font font;
             font.loadFromFile("images/sunflower.otf");
             Text text;
@@ -227,16 +244,18 @@ int main()
                 text.setString("Potracheno!");
             }
             Sprite fon(st);
-            
+
             Image icon2;
             icon2.loadFromFile("images/mipt.png");
             secondWindow.setIcon(icon2.getSize().x, icon2.getSize().y, icon2.getPixelsPtr());
 
+            window.close();
             while (secondWindow.isOpen()) {
                 Event e2;
                 while (secondWindow.pollEvent(e2)) {
-                    if (e2.type == Event::Closed)
+                    if (e2.type == Event::Closed) {
                         secondWindow.close();
+                    }
                 }
                 secondWindow.clear();
 

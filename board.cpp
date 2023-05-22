@@ -1,4 +1,6 @@
 #include "Board.h"
+using namespace std;
+
 Board::Board() = default;
 Board::~Board() = default;
 

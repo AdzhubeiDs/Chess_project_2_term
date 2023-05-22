@@ -1,4 +1,5 @@
 #include "pieceClass.h"
+using namespace std;
 
 class PieceWhite : public Piece {
 public:

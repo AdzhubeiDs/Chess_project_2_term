@@ -1,4 +1,5 @@
 #include "chessEngine.h"
+using namespace std;
 
 ChessEngine::ChessEngine() {
     update();
@@ -175,9 +176,7 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::queen, col)) {
                         pw.isCheck = false;
-                        return retNewMove((boardPieces)Board::map[it.first][it.second],
-
-                            it.first, it.second, it2.first, it2.second);
+                        return retNewMove((boardPieces)Board::map[it.first][it.second],it.first, it.second, it2.first, it2.second);
                     }
                 }
             }
@@ -226,9 +225,7 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                     }
                     for (auto it2 : temp) {
                         if (tempCnt == randMove) {
-                            return retNewMove((boardPieces)(i + 1),
-                                it.first, it.second,
-                                it2.first, it2.second);
+                            return retNewMove((boardPieces)(i + 1), it.first, it.second, it2.first, it2.second);
                         }
                         tempCnt++;
                     }
@@ -248,8 +245,7 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                     * если мы можем уйти, то супер
                     * далее, если не можем уйти, то проверяем, можем ли мы закрыться любой из наших фигур
                     * если нет, то нам поставили мат
-                    */ //\
-                                                                                                                                            пытаемся уйти королем
+                    */ //пытаемся уйти королем
             pair<int, int> newPos;
             vector<pair<int, int>> temp = Piece::kingMoves(pos.first, pos.second, col); // получили ходы
             for (auto it : temp) {
@@ -369,9 +365,7 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                     }
                     for (auto it2 : temp) {
                         if (tempCnt == randMove) {
-                            return retNewMove((boardPieces)(i + 6 + 1),
-                                it.first, it.second,
-                                it2.first, it2.second);
+                            return retNewMove((boardPieces)(i + 6 + 1), it.first, it.second, it2.first, it2.second);
                         }
                         tempCnt++;
                     }
@@ -534,3 +528,4 @@ vector<vector<pair<int, int>>> ChessEngine::getAllMoves(Colors col) {
     }
     return tempMoves;
 }
+

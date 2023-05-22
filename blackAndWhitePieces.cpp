@@ -1,4 +1,5 @@
 #include "blackAndWhitePieces.h"
+using namespace std;
 
 PieceWhite::PieceWhite() {
     figures[Pieces::pawn] = Piece::getPositions(boardPieces::whitePawn);

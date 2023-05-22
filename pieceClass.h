@@ -22,8 +22,6 @@ protected:
 
     vector<pair<int, int>> bishopMoves(int i, int j, Colors col);
 
-    // спасибо ферзю что ходит как ладья + слон\
-    -30 строк кода
     vector<pair<int, int>> queenMoves(int i, int j, Colors col);
 
     vector<pair<int, int>> kingMoves(int i, int j, Colors col);
@@ -34,11 +32,11 @@ protected:
     //protected:
     boardPieces returnFigure(Pieces piece, Colors col);
 
-    // проверка на границы доски
+    // РїСЂРѕРІРµСЂРєР° РЅР° РіСЂР°РЅРёС†С‹ РґРѕСЃРєРё
     inline bool checkRange(int i, int j);
 
 
-    // проверяем, встретили ли мы вражескую фигуру (кроме короля, с ним какая-то хрень будет)
+    // РїСЂРѕРІРµСЂСЏРµРј, РІСЃС‚СЂРµС‚РёР»Рё Р»Рё РјС‹ РІСЂР°Р¶РµСЃРєСѓСЋ С„РёРіСѓСЂСѓ (РєСЂРѕРјРµ РєРѕСЂРѕР»СЏ, СЃ РЅРёРј РїРѕ-РґСЂСѓРіРѕРјСѓ Р±СѓРґРµС‚)
     inline bool checkCell(int i, int j, Colors col);
 
     Colors changeColor(Colors col);
