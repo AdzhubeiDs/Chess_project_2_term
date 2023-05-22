@@ -92,73 +92,53 @@ vector<pair<int, int>> Piece::knightMoves(int i, int j, Colors col) {
 }
 vector<pair<int, int>> Piece::rookMoves(int i, int j, Colors col) {
     vector<pair<int, int>> ret;
-    // смотрим клетки сверху
-    for (int k = i - 1; k >= 0; k--) {
-        if (Board::map[k][j] == boardPieces::empt) {
-            ret.push_back(pair<int, int>(k, j));
-        }
-        // если встретили вражескую фигуру, то можем ее съесть
-        else if (checkCell(k, j, col)) {
-            ret.push_back(pair<int, int>(k, j));
-            break;
-        }
-        else if (checkCell(k, j, changeColor(col)) || checkKing(k, j, col)) {
-            break;
-        }
-        else {
-            break;
-        }
-    }
+
     // смотрим клетки снизу
     for (int k = i + 1; k <= 7; k++) {
-        if (Board::map[k][j] == boardPieces::empt) {
-            ret.push_back(pair<int, int>(k, j));
+        if (Board::map[k][j] == boardPieces::empt || (checkCell(k, j, col))) {
+            ret.push_back({ k, j });
+            // если кого-то съели
+            if (Board::map[j][j] != boardPieces::empt /*checkCell(k, j, col)*/) {
+                break;
+            }
         }
-        // если встретили вражескую фигуру, то можем ее съесть
-        else if (checkCell(k, j, col)) {
-            ret.push_back(pair<int, int>(k, j));
-            break;
-        }
-        else if (checkCell(k, j, changeColor(col)) || checkKing(k, j, col)) {
-            break;
-        }
-        else {
-            break;
-        }
+        else break;
     }
-    // смотрим клетки слева
+
+    // смотрим клетки сверху
     for (int k = i - 1; k >= 0; k--) {
-        if (Board::map[i][k] == boardPieces::empt) {
-            ret.push_back(pair<int, int>(i, k));
+        if (Board::map[k][j] == boardPieces::empt || (checkCell(k, j, col))) {
+            ret.push_back({ k, j });
+            // если кого-то съели
+            if (Board::map[j][j] != boardPieces::empt /*checkCell(k, j, col)*/) {
+                break;
+            }
         }
-        // если встретили вражескую фигуру, то можем ее съесть
-        else if (checkCell(i, k, col)) {
-            ret.push_back(pair<int, int>(i, k));
-            break;
-        }
-        else if (checkCell(i, k, changeColor(col)) || checkKing(i, k, col)) {
-            break;
-        }
-        else {
-            break;
-        }
+        else break;
     }
+
     // смотрим клетки справа
-    for (int k = i + 1; k <= 7; k++) {
-        if (Board::map[i][k] == boardPieces::empt) {
-            ret.push_back(pair<int, int>(i, k));
+    for (int k = j + 1; k <= 7; k++) {
+        if (Board::map[i][k] == boardPieces::empt || (checkCell(i, k, col))) {
+            ret.push_back({ i, k });
+            // если кого-то съели
+            if (Board::map[i][k] != boardPieces::empt /*checkCell(i, k, col)*/) {
+                break;
+            }
         }
-        // если встретили вражескую фигуру, то можем ее съесть
-        else if (checkCell(i, k, col)) {
-            ret.push_back(pair<int, int>(i, k));
-            break;
+        else break;
+    }
+
+    // смотрим клетки слево
+    for (int k = j - 1; k >= 0; k--) {
+        if (Board::map[i][k] == boardPieces::empt || (checkCell(i, k, col))) {
+            ret.push_back({ i, k });
+            // если кого-то съели
+            if (Board::map[i][k] != boardPieces::empt /*checkCell(i, k, col)*/) {
+                break;
+            }
         }
-        else if (checkCell(i, k, changeColor(col)) || checkKing(i, k, col)) {
-            break;
-        }
-        else {
-            break;
-        }
+        else break;
     }
     return ret;
 }
@@ -246,10 +226,10 @@ inline bool Piece::checkRange(int i, int j) {
 inline bool Piece::checkCell(int i, int j, Colors col) {
     // проверяем, если кодировка вражеской фигуры, кроме короля
     if (col == white) {
-        return Board::map[i][j] >= 7 && Board::map[i][j] <= 11;
+        return Board::map[i][j] >= 7 && Board::map[i][j] <= /*12*/ 11;
     }
     else { // black
-        return Board::map[i][j] >= 1 && Board::map[i][j] <= 5;
+        return Board::map[i][j] >= 1 && Board::map[i][j] <= /*6*/ 5;
     }
 }
 Colors Piece::changeColor(Colors col) {
@@ -284,38 +264,199 @@ vector<vector<bool>> Piece::getAllAttacks(Colors col) {
         // ладья 
         else if (temp == Pieces::rook) {
             for (auto it : tempUs) {
-                vector<pair<int, int>> v = rookMoves(it.first, it.second, col);
-                for (auto it2 : v) {
-                    nm[it2.first][it2.second] = true;
+                for (int k = it.first + 1; k <= 7; k++) {
+                    if (Board::map[k][it.second] == boardPieces::empt ||
+                        checkKing(k, it.second, changeColor(col))) {
+                        nm[k][it.second] = true;
+                    }
+                    else if (checkCell(k, it.second, col)
+                        || checkCell(k, it.second, changeColor(col))) {
+                        nm[k][it.second] = true;
+                        break;
+                    }
+                    else break;
+                }
+                for (int k = it.first - 1; k >= 0; k--) {
+                    if (Board::map[k][it.second] == boardPieces::empt ||
+                        checkKing(k, it.second, changeColor(col))) {
+                        nm[k][it.second] = true;
+                    }
+                    else if (checkCell(k, it.second, col)
+                        || checkCell(k, it.second, changeColor(col))) {
+                        nm[k][it.second] = true;
+                        break;
+                    }
+                    else break;
+                }
+
+                for (int k = it.second + 1; k <= 7; k++) {
+                    if (Board::map[it.first][k] == boardPieces::empt ||
+                        checkKing(it.first, k, changeColor(col))) {
+                        nm[it.first][k] = true;
+                    }
+                    else if (checkCell(it.first, k, col)
+                        || checkCell(it.first, k, changeColor(col))) {
+                        nm[it.first][k] = true;
+                        break;
+                    }
+                    else break;
+                }
+                for (int k = it.second - 1; k >= 0; k--) {
+                    if (Board::map[it.first][k] == boardPieces::empt ||
+                        checkKing(it.first, k, changeColor(col))) {
+                        nm[it.first][k] = true;
+                    }
+                    else if (checkCell(it.first, k, col)
+                        || checkCell(it.first, k, changeColor(col))) {
+                        nm[it.first][k] = true;
+                        break;
+                    }
+                    else break;
                 }
             }
         }
         // слон
         else if (temp == Pieces::bishop) {
             for (auto it : tempUs) {
-                vector<pair<int, int>> v = bishopMoves(it.first, it.second, col);
-                for (auto it2 : v) {
-                    nm[it2.first][it2.second] = true;
+                for (auto ii : { -1, 1 }) {
+                    for (auto jj : { -1, 1 }) {
+                        int dx = ii, dy = jj;
+                        while (checkRange(it.first + ii, it.second + jj)) {
+                            if (Board::map[it.first + ii][it.second + jj] == empt ||
+                                checkKing(it.first + ii, it.second + jj, changeColor(col))) {
+                                nm[it.first + ii][it.second + jj] = true;
+                            }
+                            else if (checkCell(it.first + ii, it.second + jj, col)
+                                || checkCell(it.first + ii, it.second + jj, changeColor(col))) {
+                                nm[it.first + ii][it.second + jj] = true;
+                                break;
+                            }
+                            else break;
+                            if (dx == -1) ii--;
+                            else if (dx == 1) ii++;
+                            if (dy == -1) jj--;
+                            else if (dy == 1) jj++;
+                        }
+                        ii = dx;
+                    }
                 }
             }
         }
         // конь
         else if (temp == Pieces::knight) {
             for (auto it : tempUs) {
-                vector<pair<int, int>> v = knightMoves(it.first, it.second, col);
-                for (auto it2 : v) {
-                    nm[it2.first][it2.second] = true;
+                // пони ходят буковкой Г
+                if (checkRange(it.first + 2, it.second - 1)) {
+                    nm[it.first + 2][it.second - 1] = true;
+                }
+                if (checkRange(it.first + 2, it.second + 1)) {
+                    nm[it.first + 2][it.second + 1] = true;
+                }
+                if (checkRange(it.first + 1, it.second - 2)) {
+                    nm[it.first + 1][it.second - 2] = true;
+                }
+                if (checkRange(it.first + 1, it.second + 2)) {
+                    nm[it.first + 1][it.second + 2] = true;
+                }
+                if (checkRange(it.first - 1, it.second - 2)) {
+                    nm[it.first - 1][it.second - 2] = true;
+                }
+                if (checkRange(it.first - 1, it.second + 2)) {
+                    nm[it.first - 1][it.second + 2] = true;
+                }
+                if (checkRange(it.first - 2, it.second - 1)) {
+                    nm[it.first - 2][it.second - 1] = true;
+                }
+                if (checkRange(it.first - 2, it.second + 1)) {
+                    nm[it.first - 2][it.second + 1] = true;
                 }
             }
         }
         // ферзь
         else if (temp == Pieces::queen) {
-            for (auto it : tempUs) {
-                vector<pair<int, int>> v = queenMoves(it.first, it.second, col);
-                for (auto it2 : v) {
-                    nm[it2.first][it2.second] = true;
+        for (auto it : tempUs) {
+
+            for (int k = it.first + 1; k <= 7; k++) {
+                if (checkRange(k, it.second)) {
+                    if (Board::map[k][it.second] == boardPieces::empt ||
+                        checkKing(k, it.second, changeColor(col))) {
+                        nm[k][it.second] = true;
+                    }
+                    else if (checkCell(k, it.second, col)
+                        || checkCell(k, it.second, changeColor(col))) {
+                        nm[k][it.second] = true;
+                        break;
+                    }
+                    else break;
                 }
             }
+            for (int k = it.first - 1; k >= 0; k--) {
+                if (checkRange(k, it.second)) {
+                    if (Board::map[k][it.second] == boardPieces::empt ||
+                        checkKing(k, it.second, changeColor(col))) {
+                        nm[k][it.second] = true;
+                    }
+                    else if (checkCell(k, it.second, col)
+                        || checkCell(k, it.second, changeColor(col))) {
+                        nm[k][it.second] = true;
+                        break;
+                    }
+                    else break;
+                }
+            }
+
+            for (int k = it.second + 1; k <= 7; k++) {
+                if (checkRange(k, it.second)) {
+                    if (Board::map[it.first][k] == boardPieces::empt ||
+                        checkKing(it.first, k, changeColor(col))) {
+                        nm[it.first][k] = true;
+                    }
+                    else if (checkCell(it.first, k, col)
+                        || checkCell(it.first, k, changeColor(col))) {
+                        nm[it.first][k] = true;
+                        break;
+                    }
+                    else break;
+                }
+            }
+            for (int k = it.second - 1; k >= 0; k--) {
+                if (checkRange(it.first, k)) {
+                    if (Board::map[it.first][k] == boardPieces::empt ||
+                        checkKing(it.first, k, changeColor(col))) {
+                        nm[it.first][k] = true;
+                    }
+                    else if (checkCell(it.first, k, col)
+                        || checkCell(it.first, k, changeColor(col))) {
+                        nm[it.first][k] = true;
+                        break;
+                    }
+                    else break;
+                }
+            }
+
+            for (auto ii : { -1, 1 }) {
+                for (auto jj : { -1, 1 }) {
+                    int dx = ii, dy = jj;
+                    while (checkRange(it.first + ii, it.second + jj)) {
+                        if (Board::map[it.first + ii][it.second + jj] == empt ||
+                            checkKing(it.first + ii, it.second + jj, changeColor(col))) {
+                            nm[it.first + ii][it.second + jj] = true;
+                        }
+                        else if (checkCell(it.first + ii, it.second + jj, col)
+                            || checkCell(it.first + ii, it.second + jj, changeColor(col))) {
+                            nm[it.first + ii][it.second + jj] = true;
+                            break;
+                        }
+                        else break;
+                        if (dx == -1) ii--;
+                        else if (dx == 1) ii++;
+                        if (dy == -1) jj--;
+                        else if (dy == 1) jj++;
+                    }
+                    ii = dx;
+                }
+            }
+        }
         }
         // король
         else if (temp == Pieces::king) {

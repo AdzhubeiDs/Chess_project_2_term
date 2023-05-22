@@ -53,7 +53,7 @@ inline bool ChessEngine::makeSomething(pair<int, int> pos, pair<int, int> from, 
             return !pw.isCheck;
         }
     }
-    else { // если черные
+    else { // РµСЃР»Рё С‡РµСЂРЅС‹Рµ
         if (Board::map[to.first][to.second] == boardPieces::empt) {
             swap(Board::map[from.first][from.second], Board::map[to.first][to.second]);
             pb.figures[Pieces::pawn].erase(from);
@@ -89,60 +89,64 @@ inline bool ChessEngine::makeSomething(pair<int, int> pos, pair<int, int> from, 
     }
 }
 
+
 retNewMove ChessEngine::getNextMove(Colors col) {
     update();
     if (col == Colors::white) {
-        // если король под шахом
+        // РµСЃР»Рё РєРѕСЂРѕР»СЊ РїРѕРґ С€Р°С…РѕРј
         pair<int, int> newMove;
         auto pos = *pw.figures[Pieces::king].begin();
         if (pw.attackByEnemies[pos.first][pos.second] == true) {
             pw.isCheck = true;
-            // 2 выхода: уйти от шаха\
-                или закрыться от шаха
+            // 2 РІС‹С…РѕРґР°: СѓР№С‚Рё РѕС‚ С€Р°С…Р°\
+                РёР»Рё Р·Р°РєСЂС‹С‚СЊСЃСЏ РѕС‚ С€Р°С…Р°
                 /*
-                * если мы можем уйти, то супер
-                * далее, если не можем уйти, то проверяем, можем ли мы закрыться любой из наших фигур
-                * если нет, то нам поставили мат
+                * РµСЃР»Рё РјС‹ РјРѕР¶РµРј СѓР№С‚Рё, С‚Рѕ СЃСѓРїРµСЂ
+                * РґР°Р»РµРµ, РµСЃР»Рё РЅРµ РјРѕР¶РµРј СѓР№С‚Рё, С‚Рѕ РїСЂРѕРІРµСЂСЏРµРј, РјРѕР¶РµРј Р»Рё РјС‹ Р·Р°РєСЂС‹С‚СЊСЃСЏ Р»СЋР±РѕР№ РёР· РЅР°С€РёС… С„РёРіСѓСЂ
+                * РµСЃР»Рё РЅРµС‚, С‚Рѕ РЅР°Рј РїРѕСЃС‚Р°РІРёР»Рё РјР°С‚
                 */ //\
-                                                                                                пытаемся уйти королем
+                                                                                                                РїС‹С‚Р°РµРјСЃСЏ СѓР№С‚Рё РєРѕСЂРѕР»РµРј
             pair<int, int> newPos;
-            vector<pair<int, int>> temp = Piece::kingMoves(pos.first, pos.second, col); // получили ходы
+            vector<pair<int, int>> temp = Piece::kingMoves(pos.first, pos.second, col); // РїРѕР»СѓС‡РёР»Рё С…РѕРґС‹
             for (auto it : temp) {
-                // если нашли куда отойти
+                // РµСЃР»Рё РЅР°С€Р»Рё РєСѓРґР° РѕС‚РѕР№С‚Рё
                 if (pw.attackByEnemies[it.first][it.second] == false) {
                     newPos = it;
                     pw.isCheck = false;
                     return retNewMove(boardPieces::whiteKing, pos.first, pos.second, it.first, it.second);
                 }
             }
-            // иначе пытаемся закрыться
-            // получаем все возможные ходы
-            // пешка
-            for (auto it : pw.figures[Pieces::pawn]) {
+            // РёРЅР°С‡Рµ РїС‹С‚Р°РµРјСЃСЏ Р·Р°РєСЂС‹С‚СЊСЃСЏ
+            // РїРѕР»СѓС‡Р°РµРј РІСЃРµ РІРѕР·РјРѕР¶РЅС‹Рµ С…РѕРґС‹
+            // РїРµС€РєР°
+            unordered_set<pair<int, int>, hash_pair> tempSet = pw.figures[Pieces::pawn];
+            for (auto it : tempSet) {
                 temp = Piece::pawnMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::pawn, col)) {
-                        // нашли ход
+                        // РЅР°С€Р»Рё С…РѕРґ
                         pw.isCheck = false;
                         return retNewMove((boardPieces)Board::map[it.first][it.second],
                             it.first, it.second, it2.first, it2.second);
                     }
                 }
             }
-            // конь
-            for (auto it : pw.figures[Pieces::knight]) {
+            // РєРѕРЅСЊ
+            tempSet = pw.figures[Pieces::knight];
+            for (auto it : tempSet) {
                 temp = Piece::knightMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::knight, col)) {
-                        // нашли ход
+                        // РЅР°С€Р»Рё С…РѕРґ
                         pw.isCheck = false;
                         return retNewMove((boardPieces)Board::map[it.first][it.second],
                             it.first, it.second, it2.first, it2.second);
                     }
                 }
             }
-            // слон
-            for (auto it : pw.figures[Pieces::bishop]) {
+            // СЃР»РѕРЅ
+            tempSet = pw.figures[Pieces::bishop];
+            for (auto it : tempSet) {
                 temp = Piece::bishopMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::bishop, col)) {
@@ -152,8 +156,9 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                     }
                 }
             }
-            // ладья
-            for (auto it : pw.figures[Pieces::rook]) {
+            // Р»Р°РґСЊСЏ
+            tempSet = pw.figures[Pieces::rook];
+            for (auto it : tempSet) {
                 temp = Piece::rookMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::rook, col)) {
@@ -163,13 +168,15 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                     }
                 }
             }
-            // ферзь
-            for (auto it : pw.figures[Pieces::queen]) {
+            // С„РµСЂР·СЊ
+            tempSet = pw.figures[Pieces::queen];
+            for (auto it : tempSet) {
                 temp = Piece::queenMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::queen, col)) {
                         pw.isCheck = false;
                         return retNewMove((boardPieces)Board::map[it.first][it.second],
+
                             it.first, it.second, it2.first, it2.second);
                     }
                 }
@@ -178,7 +185,7 @@ retNewMove ChessEngine::getNextMove(Colors col) {
             return retNewMove(boardPieces::empt, -1, -1, -1, -1);
         }
         else {
-            // СДЕЛАТЬ РАНДОМ
+            // РЎР”Р•Р›РђРўР¬ Р РђРќР”РћРњ
 
             // getAllMoves()\
                 rand()
@@ -189,11 +196,11 @@ retNewMove ChessEngine::getNextMove(Colors col) {
             }
             if (cntMoves == 0) {
                 pw.isStaleMate = true;
-                // Аче дальше делать - то?\
-                    наверн просто ретурн + проверка в другом файле на сталемате
+                // РђС‡Рµ РґР°Р»СЊС€Рµ РґРµР»Р°С‚СЊ - С‚Рѕ?\
+                    РЅР°РІРµСЂРЅ РїСЂРѕСЃС‚Рѕ СЂРµС‚СѓСЂРЅ + РїСЂРѕРІРµСЂРєР° РІ РґСЂСѓРіРѕРј С„Р°Р№Р»Рµ РЅР° СЃС‚Р°Р»РµРјР°С‚Рµ
                 return retNewMove(boardPieces::empt, -1, -1, -1, -1);
             }
-            // ищем рандомный ход
+            // РёС‰РµРј СЂР°РЅРґРѕРјРЅС‹Р№ С…РѕРґ
             int randMove = dist.get_rand() % cntMoves;
             int tempCnt = 0;
             vector<pair<int, int>> temp;
@@ -229,45 +236,48 @@ retNewMove ChessEngine::getNextMove(Colors col) {
             }
         }
     }
-    else { // ЕСЛИ ХОДЯТ ЧЕРНЫЕ
-        // если король под шахом
+    else { // Р•РЎР›Р РҐРћР”РЇРў Р§Р•Р РќР«Р•
+        // РµСЃР»Рё РєРѕСЂРѕР»СЊ РїРѕРґ С€Р°С…РѕРј
         pair<int, int> newMove;
         auto pos = *pb.figures[Pieces::king].begin();
         if (pb.attackByEnemies[pos.first][pos.second] == true) {
             pb.isCheck = true;
-            // 2 выхода: уйти от шаха\
-                    или закрыться от шаха
+            // 2 РІС‹С…РѕРґР°: СѓР№С‚Рё РѕС‚ С€Р°С…Р°\
+                    РёР»Рё Р·Р°РєСЂС‹С‚СЊСЃСЏ РѕС‚ С€Р°С…Р°
                     /*
-                    * если мы можем уйти, то супер
-                    * далее, если не можем уйти, то проверяем, можем ли мы закрыться любой из наших фигур
-                    * если нет, то нам поставили мат
+                    * РµСЃР»Рё РјС‹ РјРѕР¶РµРј СѓР№С‚Рё, С‚Рѕ СЃСѓРїРµСЂ
+                    * РґР°Р»РµРµ, РµСЃР»Рё РЅРµ РјРѕР¶РµРј СѓР№С‚Рё, С‚Рѕ РїСЂРѕРІРµСЂСЏРµРј, РјРѕР¶РµРј Р»Рё РјС‹ Р·Р°РєСЂС‹С‚СЊСЃСЏ Р»СЋР±РѕР№ РёР· РЅР°С€РёС… С„РёРіСѓСЂ
+                    * РµСЃР»Рё РЅРµС‚, С‚Рѕ РЅР°Рј РїРѕСЃС‚Р°РІРёР»Рё РјР°С‚
                     */ //\
-                                                                                                                        пытаемся уйти королем
+                                                                                                                                            РїС‹С‚Р°РµРјСЃСЏ СѓР№С‚Рё РєРѕСЂРѕР»РµРј
             pair<int, int> newPos;
-            vector<pair<int, int>> temp = Piece::kingMoves(pos.first, pos.second, col); // получили ходы
+            vector<pair<int, int>> temp = Piece::kingMoves(pos.first, pos.second, col); // РїРѕР»СѓС‡РёР»Рё С…РѕРґС‹
             for (auto it : temp) {
-                // если нашли куда отойти
+                // РµСЃР»Рё РЅР°С€Р»Рё РєСѓРґР° РѕС‚РѕР№С‚Рё
                 if (pb.attackByEnemies[it.first][it.second] == false) {
                     pb.isCheck = false;
-                    return retNewMove((boardPieces)Board::map[it.first][it.second],
+                    return retNewMove(boardPieces::blackKing,
                         pos.first, pos.second, it.first, it.second);
                 }
             }
-            // иначе пытаемся закрыться
-            // получаем все возможные ходы
-                // пешка
-            for (auto it : pb.figures[Pieces::pawn]) {
+            // РёРЅР°С‡Рµ РїС‹С‚Р°РµРјСЃСЏ Р·Р°РєСЂС‹С‚СЊСЃСЏ
+            // РїРѕР»СѓС‡Р°РµРј РІСЃРµ РІРѕР·РјРѕР¶РЅС‹Рµ С…РѕРґС‹
+                // РїРµС€РєР°
+            unordered_set<pair<int, int>, hash_pair> tempSet = pb.figures[Pieces::pawn];
+            for (auto it : tempSet) {
                 temp = Piece::pawnMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::pawn, col)) {
+
                         pb.isCheck = false;
                         return retNewMove((boardPieces)Board::map[it.first][it.second],
                             it.first, it.second, it2.first, it2.second);
                     }
                 }
             }
-            // конь
-            for (auto it : pb.figures[Pieces::knight]) {
+            // РєРѕРЅСЊ
+            tempSet = pb.figures[Pieces::knight];
+            for (auto it : tempSet) {
                 temp = Piece::knightMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::knight, col)) {
@@ -277,8 +287,9 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                     }
                 }
             }
-            // слон
-            for (auto it : pb.figures[Pieces::bishop]) {
+            // СЃР»РѕРЅ
+            tempSet = pb.figures[Pieces::bishop];
+            for (auto it : tempSet) {
                 temp = Piece::bishopMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::bishop, col)) {
@@ -288,8 +299,9 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                     }
                 }
             }
-            // ладья
-            for (auto it : pb.figures[Pieces::rook]) {
+            // Р»Р°РґСЊСЏ
+            tempSet = pb.figures[Pieces::rook];
+            for (auto it : tempSet) {
                 temp = Piece::rookMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::rook, col)) {
@@ -299,8 +311,9 @@ retNewMove ChessEngine::getNextMove(Colors col) {
                     }
                 }
             }
-            // ферзь
-            for (auto it : pb.figures[Pieces::queen]) {
+            // С„РµСЂР·СЊ
+            tempSet = pb.figures[Pieces::queen];
+            for (auto it : tempSet) {
                 temp = Piece::queenMoves(it.first, it.second, col);
                 for (auto it2 : temp) {
                     if (makeSomething(pos, it, it2, Pieces::queen, col)) {
@@ -314,7 +327,8 @@ retNewMove ChessEngine::getNextMove(Colors col) {
             return retNewMove(boardPieces::empt, -1, -1, -1, -1);
         }
         else {
-            // СДЕЛАТЬ РАНДОМ
+            // РЎР”Р•Р›РђРўР¬ Р РђРќР”РћРњ
+
 
             // getAllMoves()\
                     rand()
@@ -325,11 +339,11 @@ retNewMove ChessEngine::getNextMove(Colors col) {
             }
             if (cntMoves == 0) {
                 pb.isStaleMate = true;
-                // Аче дальше делать - то?\
-                    наверн просто ретурн + проверка в другом файле на сталемате
+                // РђС‡Рµ РґР°Р»СЊС€Рµ РґРµР»Р°С‚СЊ - С‚Рѕ?\
+                    РЅР°РІРµСЂРЅ РїСЂРѕСЃС‚Рѕ СЂРµС‚СѓСЂРЅ + РїСЂРѕРІРµСЂРєР° РІ РґСЂСѓРіРѕРј С„Р°Р№Р»Рµ РЅР° СЃС‚Р°Р»РµРјР°С‚Рµ
                 return retNewMove(boardPieces::empt, -1, -1, -1, -1);
             }
-            // ищем рандомный ход
+            // РёС‰РµРј СЂР°РЅРґРѕРјРЅС‹Р№ С…РѕРґ
             int randMove = dist.get_rand() % cntMoves;
             int tempCnt = 0;
             vector<pair<int, int>> temp;
@@ -366,16 +380,16 @@ retNewMove ChessEngine::getNextMove(Colors col) {
         }
     }
 }
-int ChessEngine::makeNextMove(Colors col) {
+retNewMove ChessEngine::makeNextMove(Colors col) {
     retNewMove rnm = getNextMove(col);
     if (col == Colors::white) {
         if (pw.isCheckMate == true) {
-            return 1;
+            return retNewMove(boardPieces::empt, -1, -1, -1, -1);
         }
         if (pw.isStaleMate == true) {
-            return 2;
+            return retNewMove(boardPieces::empt, -2, -2, -2, -2);
         }
-        // если кого-то едим, то должны удалить чужую фигуру
+        // РµСЃР»Рё РєРѕРіРѕ-С‚Рѕ РµРґРёРј, С‚Рѕ РґРѕР»Р¶РЅС‹ СѓРґР°Р»РёС‚СЊ С‡СѓР¶СѓСЋ С„РёРіСѓСЂСѓ
         if (Board::map[rnm.to1][rnm.to2] != boardPieces::empt) {
             pb.figures[Board::map[rnm.to1][rnm.to2] - 6 - 1].erase({ rnm.to1, rnm.to2 });
             Board::map[rnm.to1][rnm.to2] = boardPieces::empt;
@@ -383,17 +397,27 @@ int ChessEngine::makeNextMove(Colors col) {
         pw.figures[rnm.bp - 1].erase({ rnm.from1, rnm.from2 });
         pw.figures[rnm.bp - 1].insert({ rnm.to1, rnm.to2 });
         swap(Board::map[rnm.from1][rnm.from2], Board::map[rnm.to1][rnm.to2]);
+
+        // РµСЃР»Рё РґРѕС€Р»Рё РїРµС€РєРѕР№ РґРѕ РєСЂР°СЏ РґРѕСЃРєРё, С‚Рѕ РїСЂРµРІСЂР°С‰Р°РµРј РµРµ РІ С„РµСЂР·СЏ
+        if (Board::map[rnm.to1][rnm.to2] == boardPieces::whitePawn && rnm.to1 == 0) {
+            pw.figures[Pieces::pawn].erase({ rnm.to1, rnm.to2 });
+            pw.figures[Pieces::queen].insert({ rnm.to1, rnm.to2 });
+            Board::map[rnm.to1][rnm.to2] = boardPieces::whiteQueen;
+        }
+
         update();
-        return 0;
+
+
+        return rnm;
     }
     else {
         if (col == Colors::black && pb.isCheckMate == true) {
-            return 1;
+            return retNewMove(boardPieces::empt, -1, -1, -1, -1);
         }
         if (col == Colors::black && pb.isStaleMate == true) {
-            return 2;
+            return retNewMove(boardPieces::empt, -2, -2, -2, -2);
         }
-        // если кого-то едим, то должны удалить чужую фигуру
+        // РµСЃР»Рё РєРѕРіРѕ-С‚Рѕ РµРґРёРј, С‚Рѕ РґРѕР»Р¶РЅС‹ СѓРґР°Р»РёС‚СЊ С‡СѓР¶СѓСЋ С„РёРіСѓСЂСѓ
         if (Board::map[rnm.to1][rnm.to2] != boardPieces::empt) {
             pw.figures[Board::map[rnm.to1][rnm.to2] - 1].erase({ rnm.to1, rnm.to2 });
             Board::map[rnm.to1][rnm.to2] = boardPieces::empt;
@@ -401,9 +425,77 @@ int ChessEngine::makeNextMove(Colors col) {
         pb.figures[rnm.bp - 6 - 1].erase({ rnm.from1, rnm.from2 });
         pb.figures[rnm.bp - 6 - 1].insert({ rnm.to1, rnm.to2 });
         swap(Board::map[rnm.from1][rnm.from2], Board::map[rnm.to1][rnm.to2]);
+
+        // РµСЃР»Рё РґРѕС€Р»Рё РїРµС€РєРѕР№ РґРѕ РєСЂР°СЏ РґРѕСЃРєРё, С‚Рѕ РїСЂРµРІСЂР°С‰Р°РµРј РµРµ РІ С„РµСЂР·СЏ
+        if (Board::map[rnm.to1][rnm.to2] == boardPieces::blackPawn && rnm.to1 == 7) {
+            pb.figures[Pieces::pawn].erase({ rnm.to1, rnm.to2 });
+            pb.figures[Pieces::queen].insert({ rnm.to1, rnm.to2 });
+            Board::map[rnm.to1][rnm.to2] = boardPieces::blackQueen;
+        }
+
         update();
-        return 0;
+        return rnm;
     }
+}
+
+// РїСЂРµРґРїРѕР»Р°РіР°РµРј, С‡С‚Рѕ СЃРґРµР»Р°РЅ РєРѕСЂСЂРµРєС‚РЅС‹Р№ С…РѕРґ\
+    Р·Р°С‰РёС‚С‹ РѕС‚ РґСѓСЂР°РєР° РїРѕРєР° С‡С‚Рѕ РЅРµ Р±СѓРґРµС‚
+void ChessEngine::setNextMove(int from1, int from2, int to1, int to2, Colors col) {
+    if (col == Colors::white) {
+        if (Board::map[to1][to2] == boardPieces::empt) {
+            // РѕР±РЅРѕРІРёР»Рё Р±Рґ
+            pw.figures[Board::map[from1][from2] - 1].insert({ to1, to2 });
+            pw.figures[Board::map[from1][from2] - 1].erase({ from1, from2 });
+
+            // РѕР±РЅРѕРІРёР»Рё РєР°СЂС‚Сѓ
+            swap(Board::map[from1][from2], Board::map[to1][to2]);
+        }
+        else {
+            pb.figures[Board::map[to1][to2] - 6 - 1].erase({ to1, to2 });
+
+            pw.figures[Board::map[from1][from2] - 1].insert({ to1, to2 });
+            pw.figures[Board::map[from1][from2] - 1].erase({ from1, from2 });
+
+            Board::map[to1][to2] = boardPieces::empt;
+            swap(Board::map[from1][from2], Board::map[to1][to2]);
+        }
+
+        // РґРѕС€Р»Рё РїРµС€РєРѕР№ РґРѕ РєРѕРЅС†Р° РґРѕСЃРєРё
+        if (Board::map[to1][to2] == boardPieces::whitePawn && to1 == 0) {
+            pw.figures[Pieces::pawn].erase({ to1, to2 });
+            pw.figures[Pieces::queen].insert({ to1, to2 });
+            Board::map[to1][to2] = boardPieces::whiteQueen;
+        }
+    }
+    else { // С…РѕРґ С‡РµСЂРЅС‹С…
+        if (Board::map[to1][to2] == boardPieces::empt) {
+            // РѕР±РЅРѕРІРёР»Рё Р±Рґ
+            pb.figures[Board::map[from1][from2] - 6 - 1].insert({ to1, to2 });
+            pb.figures[Board::map[from1][from2] - 6 - 1].erase({ from1, from2 });
+
+            // РѕР±РЅРѕРІРёР»Рё РєР°СЂС‚Сѓ
+            swap(Board::map[from1][from2], Board::map[to1][to2]);
+        }
+        else {
+            // СѓРґР°Р»РёР»Рё РІСЂР°Р¶РµСЃРєСѓСЋ С„РёРіСѓСЂСѓ
+            pw.figures[Board::map[to1][to2] - 1].erase({ to1, to2 });
+
+            // РѕР±РЅРѕРІРёР»Рё Р±Рґ
+            pb.figures[Board::map[from1][from2] - 6 - 1].insert({ to1, to2 });
+            pb.figures[Board::map[from1][from2] - 6 - 1].erase({ from1, from2 });
+
+            Board::map[to1][to2] = boardPieces::empt;
+            swap(Board::map[from1][from2], Board::map[to1][to2]);
+        }
+
+        // РґРѕС€Р»Рё РїРµС€РєРѕР№ РґРѕ РєРѕРЅС†Р° РґРѕСЃРєРё
+        if (Board::map[to1][to2] == boardPieces::blackPawn && to1 == 0) {
+            pb.figures[Pieces::pawn].erase({ to1, to2 });
+            pb.figures[Pieces::queen].insert({ to1, to2 });
+            Board::map[to1][to2] = boardPieces::blackQueen;
+        }
+    }
+    update();
 }
 
 
